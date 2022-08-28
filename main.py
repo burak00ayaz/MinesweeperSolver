@@ -19,12 +19,10 @@ def template_match(small_image: np.ndarray, large_image: np.ndarray):
     #cv2.imshow('res', large_image)
     return results
 
-one = cv2.imread('one.png')
-
 class Game:
     def __init__(self):
         screenshot = get_screenshot()
-        tiles = template_match(cv2.imread('square.png'), screenshot)
+        tiles = template_match(square, screenshot)
         if not tiles:
             print ('Minesweeper screen should be visible..')
             exit(1)
@@ -33,7 +31,6 @@ class Game:
         y_diff = tiles[self.width][1] - tiles[0][1]
         self.height = int((tiles[-1][1] - tiles[0][1]) / y_diff) + 1
         self.tiles = np.reshape(tiles, (self.height, self.width, 2))
-
         # 0: unknown, 1,..6: mine numbers, 8:empty, -1: mine (flagged)
         self.board = np.zeros((self.height, self.width), dtype=np.byte)
         self.game()
@@ -47,19 +44,39 @@ class Game:
     def update_tile(self, coord: (int, int), value: int):
         for w in range(self.width):
             for h in range(self.height):
-                print(self.distance(self.tiles[w][h], coord))
-        #result = np.where(self.tiles[:2] < coord[0])
-        #print(result)
+                if self.distance(self.tiles[w][h], coord) < 5:
+                    self.board[w][h] = value
+                    return
 
     def update_board(self):
         screenshot = get_screenshot()
         ones = template_match(one, screenshot)
         for p in ones:
             self.update_tile(p, 1)
+        twos = template_match(two, screenshot)
+        for p in twos:
+            self.update_tile(p, 2)
+        threes = template_match(three, screenshot)
+        for p in threes:
+            self.update_tile(p, 3)
+        fours = template_match(four, screenshot)
+        for p in fours:
+            self.update_tile(p, 4)
+        fives = template_match(five, screenshot)
+        for p in fives:
+            self.update_tile(p, 5)
+            
+        for w in range(self.width):
+            for h in range(self.height):
+                if self.board[w][h] == 0:
+                    self.board[w][h] = 8
+
+        remaining = template_match(square, screenshot)
+        for p in remaining:
+            self.update_tile(p, 0)
 
     def move_away_mouse(self):
         pyautogui.moveTo(self.tiles[0][0][0] - 50, self.tiles[0][0][1] - 50)
-
 
     def game(self):
         self.click(self.tiles[2][2]) #focus click
@@ -68,67 +85,16 @@ class Game:
         self.update_board()
         print(self.board)
 
+square = cv2.imread('square.png')
+one = cv2.imread('one.png')
+two = cv2.imread('two.png')
+three = cv2.imread('three.png')
+four = cv2.imread('four.png')
+five = cv2.imread('five.png')
+empty = cv2.imread('empty.png')
+
 Game()
-#screenshot = get_screenshot()
-#template_match(one, screenshot)
-
-#cv2.imshow('out', get_screenshot())
-#cv2.waitKey(0)
-
-
-def test():
-    method = cv2.TM_SQDIFF_NORMED
-
-    # Read the images from the file
-    small_image = cv2.imread('smiley.png')
-    large_image = get_screenshot()
-
-
-    result = cv2.matchTemplate(small_image, large_image, method)
-    print(result)
-
-    # We want the minimum squared difference
-    mn,_,mnLoc,_ = cv2.minMaxLoc(result)
-
-    # Draw the rectangle:
-    # Extract the coordinates of our best match
-    MPx,MPy = mnLoc
-
-    # Step 2: Get the size of the template. This is the same size as the match.
-    trows,tcols = small_image.shape[:2]
-
-    # Step 3: Draw the rectangle on large_image
-    cv2.rectangle(large_image, (MPx,MPy),(MPx+tcols,MPy+trows),(0,0,255),2)
-
-    # Display the original image with the rectangle around the match.
-    cv2.imshow('output',large_image)
-
-    # The image is only displayed if we call this
-    cv2.waitKey(0)
-
-def test2():
-    method = cv2.TM_SQDIFF_NORMED
-
-    # Read the images from the file
-    small_image = cv2.imread('smiley.png')
-    large_image = get_screenshot()
-    w, h = small_image.shape[:-1]
-
-
-    result = cv2.matchTemplate(small_image, large_image, cv2.TM_CCOEFF_NORMED)
-
-    threshold = .8
-    loc = np.where(result >= threshold)
-    for pt in zip(*loc[::-1]):  # Switch collumns and rows
-        cv2.rectangle(large_image, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
-
-
-
-    # Display the original image with the rectangle around the match.
-    cv2.imshow('output',large_image)
-
-    # The image is only displayed if we call this
-    cv2.waitKey(0)
+print("end")
 
 
 
