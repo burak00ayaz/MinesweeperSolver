@@ -1,6 +1,7 @@
 import cv2
 import pyautogui
 import numpy as np
+from random import *
 
 
 def get_screenshot() -> np.ndarray:
@@ -48,50 +49,66 @@ class Game:
                     self.board[w][h] = value
                     return
 
+    def find_figures(self, screenshot, image, value):
+        results = template_match(image, screenshot)
+        for p in results:
+            self.update_tile(p, value)
+        return results
+        
+
     def update_board(self):
         screenshot = get_screenshot()
-        ones = template_match(one, screenshot)
-        for p in ones:
-            self.update_tile(p, 1)
-        twos = template_match(two, screenshot)
-        for p in twos:
-            self.update_tile(p, 2)
-        threes = template_match(three, screenshot)
-        for p in threes:
-            self.update_tile(p, 3)
-        fours = template_match(four, screenshot)
-        for p in fours:
-            self.update_tile(p, 4)
-        fives = template_match(five, screenshot)
-        for p in fives:
-            self.update_tile(p, 5)
-            
+        if self.find_figures(screenshot, dead, 0):
+            exit(0)
+        self.find_figures(screenshot, one, 1)
+        self.find_figures(screenshot, two, 2)
+        self.find_figures(screenshot, three, 3)
+        self.find_figures(screenshot, four, 4)
+        self.find_figures(screenshot, five, 5)           
         for w in range(self.width):
             for h in range(self.height):
                 if self.board[w][h] == 0:
                     self.board[w][h] = 8
+        self.find_figures(screenshot, square, 0)
 
-        remaining = template_match(square, screenshot)
-        for p in remaining:
-            self.update_tile(p, 0)
 
     def move_away_mouse(self):
         pyautogui.moveTo(self.tiles[0][0][0] - 50, self.tiles[0][0][1] - 50)
 
-    def game(self):
-        self.click(self.tiles[2][2]) #focus click
-        self.click(self.tiles[2][2])
-        self.move_away_mouse()
-        self.update_board()
-        print(self.board)
+    def calculate_moves(self):
+        pass
 
-square = cv2.imread('square.png')
-one = cv2.imread('one.png')
-two = cv2.imread('two.png')
-three = cv2.imread('three.png')
-four = cv2.imread('four.png')
-five = cv2.imread('five.png')
-empty = cv2.imread('empty.png')
+    def click_unknown_tile(self):
+        for w in range(self.width):
+            for h in range(self.height):
+                if self.board[w][h] == 0:
+                    self.click(self.tiles[w][h])
+                    return
+
+    def game(self):
+        self.click(self.tiles[0][0]) #focus click
+        self.click(self.tiles[0][0]) #initial click
+        
+        while True:
+            self.move_away_mouse()
+            self.update_board()
+            print(self.board)
+            moves = self.calculate_moves()
+            
+            if not moves:
+                self.click_unknown_tile()
+            else:
+                for tile in moves:
+                    self.click(tile)
+
+square = cv2.imread('images/square.png')
+one = cv2.imread('images/one.png')
+two = cv2.imread('images/two.png')
+three = cv2.imread('images/three.png')
+four = cv2.imread('images/four.png')
+five = cv2.imread('images/five.png')
+empty = cv2.imread('images/empty.png')
+dead = cv2.imread('images/dead.png')
 
 Game()
 print("end")
