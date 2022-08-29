@@ -55,15 +55,20 @@ class GameBoard:
             self.tiles = outer_instance.tiles
 
         def click(self, x: int, y: int):
-            point = self.tiles[x][y]
+            point = self.tiles[y][x]
             pyautogui.click(point[0], point[1])
+
+        def right_click(self, x: int, y: int):
+            point = self.tiles[y][x]
+            pyautogui.click(point[0], point[1], button='right')
 
         def move_away_mouse(self):
             pyautogui.moveTo(self.tiles[0][0][0] - 50, self.tiles[0][0][1] - 50)
 
+    #starting from top, in clock direction
     def get_surrounding_tiles(self, x, y):
-        surr = [(x+1,y),(x+1,y+1),(x+1,y-1),(x,y+1),
-                (x,y-1),(x-1,y-1),(x-1,y),(x-1,y+1)]
+        surr = [(x,y-1),(x+1,y-1),(x+1,y),(x+1,y+1),
+                (x,y+1),(x-1,y+1),(x-1,y),(x-1,y-1)]
         return [p for p in surr if p[0] >= 0 and p[0] < self.width
                 and p[1] >= 0 and p[1] < self.height]
 
@@ -88,6 +93,10 @@ class GameBoard:
     def update_board(self):
         screenshot = self.get_screenshot()
         if self.template_match(dead, screenshot):
+            print("Sorry... We'll get them next time.")
+            exit(0)
+        if self.template_match(won, screenshot):
+            print("Hahaaa. Completed.")
             exit(0)
         self.find_figures(screenshot, one, 1)
         self.find_figures(screenshot, two, 2)
@@ -105,3 +114,4 @@ three = cv2.imread('three.png')
 four = cv2.imread('four.png')
 five = cv2.imread('five.png')
 dead = cv2.imread('dead.png')
+won = cv2.imread('won.png')

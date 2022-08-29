@@ -4,6 +4,7 @@ import numpy as np
 from random import *
 from enum import Enum
 from game_board import GameBoard
+import time
 
 
 class Strategy(GameBoard):
@@ -11,37 +12,39 @@ class Strategy(GameBoard):
         GameBoard.__init__(self)
         self.game()
 
-    def filter_value(self, tiles, value):
-        res = []
-        for p in tiles:
-            x = p[0]
-            y = p[1]
-            if self.board[x][y] == value:
-                res.append(p)
-        return res
-
-    def calculate_moves(self):
-        moves = []
+    def click_unknown_tile(self):
         for h in range(self.height):
             for w in range(self.width):
-                if self.board[h][w] == 1:
-                    surr = self.get_surrounding_tiles(w,h)
-                    
-                    ones = self.filter_value(surr, 1)
-                    if len(ones) == 1:
-                        moves.append(ones[0])
-                        
-                    
-
-    def click_unknown_tile(self):
-        for w in range(self.width):
-            for h in range(self.height):
                 if self.board[h][w] == 0:
                     self.mouse.click(w, h)
                     return
 
     def flag_mines(self):
-        pass
+        for y in range(self.height):
+            for x in range(self.width):
+                value = self.board[y][x]
+                surr = self.get_surrounding_tiles(x,y)
+                unknowns = [p for p in surr if self.board[p[1]][p[0]] == 0] #count unknowns
+                mines = [p for p in surr if self.board[p[1]][p[0]] == -1] #count mines
+                if len(unknowns) + len(mines) == value:
+                    for u in unknowns:
+                        self.mouse.right_click(u[0], u[1])
+                        self.board[u[1]][u[0]] = -1 #flag mine
+
+    def possible_moves(self):
+        moves = []
+        for y in range(self.height):
+            for x in range(self.width):
+                value = self.board[y][x]
+                if value == 0 or value == -1 or value == 8:
+                    continue
+                surr = self.get_surrounding_tiles(x,y)
+                mines = [p for p in surr if self.board[p[1]][p[0]] == -1] #count mines
+                if len(mines) == value:
+                    for p in surr:
+                        if self.board[p[1]][p[0]] == 0: #every surrounding unknown is playable
+                            moves.append(p)
+        return moves
 
 
     def game(self):
@@ -52,15 +55,14 @@ class Strategy(GameBoard):
             self.mouse.move_away_mouse()
             self.update_board()
             self.flag_mines()
-            
-            moves = self.calculate_moves()
-            print(self.board)
-            
+            moves = self.possible_moves()
+
             if not moves:
                 self.click_unknown_tile()
             else:
-                for move in moves:
-                    self.click(move[0], move[1])
+                for move in set(moves):
+                    self.mouse.click(move[0], move[1])
+            time.sleep(1)
 
 
 Strategy()
