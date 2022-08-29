@@ -93,10 +93,10 @@ class GameBoard:
     def update_board(self):
         screenshot = self.get_screenshot()
         if self.template_match(dead, screenshot):
-            print("Sorry... We'll get them next time.")
+            print("Sorry...")
             exit(0)
         if self.template_match(won, screenshot):
-            print("Hahaaa. Completed.")
+            print("Completed :)")
             exit(0)
         self.find_figures(screenshot, one, 1)
         self.find_figures(screenshot, two, 2)

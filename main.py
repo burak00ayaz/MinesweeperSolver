@@ -10,7 +10,6 @@ import time
 class Strategy(GameBoard):
     def __init__(self):
         GameBoard.__init__(self)
-        self.game()
 
     def click_unknown_tile(self):
         for h in range(self.height):
@@ -58,14 +57,15 @@ class Strategy(GameBoard):
             moves = self.possible_moves()
 
             if not moves:
-                self.click_unknown_tile()
+                #self.click_unknown_tile()
+                input('I could not find a move.')
             else:
                 for move in set(moves):
                     self.mouse.click(move[0], move[1])
-            time.sleep(1)
 
 
-Strategy()
+player = Strategy()
+player.game()
 
 
 
