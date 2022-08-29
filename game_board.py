@@ -33,6 +33,7 @@ class GameBoard:
             results.append((int(pt[0] + w/2), int(pt[1] + h/2)))
             #cv2.rectangle(large_image, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
         #cv2.imshow('res', large_image)
+        #cv2.waitKey(0)
         return results
 
     def get_screenshot(self) -> np.ndarray:
