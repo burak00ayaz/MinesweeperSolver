@@ -5,6 +5,7 @@ from random import *
 from enum import Enum
 from game_board import GameBoard
 import time
+import os
 
 
 class Strategy(GameBoard):
@@ -49,6 +50,8 @@ class Strategy(GameBoard):
     def game(self):
         self.mouse.click(0, 0) #focus click
         self.mouse.click(0, 0) #initial click
+
+        n = 0
         
         while True:
             self.mouse.move_away_mouse()
@@ -58,11 +61,12 @@ class Strategy(GameBoard):
 
             if not moves:
                 #self.click_unknown_tile()
-                input('I could not find a move.')
+                i = input('[+] I could not find a move.\n[+] Play a move and press Enter to let me continue.')
+                if i == "b":
+                    self.print_board()
             else:
                 for move in set(moves):
                     self.mouse.click(move[0], move[1])
-
 
 player = Strategy()
 player.game()

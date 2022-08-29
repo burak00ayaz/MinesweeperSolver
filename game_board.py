@@ -5,9 +5,9 @@ from random import *
 from enum import Enum
 import os
 
-
 class GameBoard:
     def __init__(self):
+        os.system('color')
         screenshot = self.get_screenshot()
         tiles = self.template_match(square, screenshot)
         if not tiles:
@@ -64,6 +64,20 @@ class GameBoard:
 
         def move_away_mouse(self):
             pyautogui.moveTo(self.tiles[0][0][0] - 50, self.tiles[0][0][1] - 50)
+
+    def print_board(self):
+        color_dict = {1: '\033[94m', 2: '\033[92m', 3: '\033[95m', 
+                        4: '\033[96m', 5: '\033[93m', 6: '\033[93m', '': '\033[93m',
+                        0: '\033[93m', -1: '\033[91m', -2: '\033[0m'}
+
+        for h in range(self.height):
+            print('[', end='')
+            for w in range(self.width):
+                value = self.board[h][w]
+                value = '' if value == 8 else value
+                print(f'{color_dict[value]}{value:3}{color_dict[-2]}', end='')
+            print(']')
+        print()
 
     #starting from top, in clock direction
     def get_surrounding_tiles(self, x, y):
