@@ -20,6 +20,8 @@ class Strategy(GameBoard):
                     return
 
     def flag_mines(self):
+    	# We check surrounding tiles of a tile. If the sum of surrounding unknown tiles
+    	# and flagged mines equals the tile's number, we conclude that the unknown tiles are mines. 
         for y in range(self.height):
             for x in range(self.width):
                 value = self.board[y][x]
@@ -32,6 +34,8 @@ class Strategy(GameBoard):
                         self.board[u[1]][u[0]] = -1 #flag mine
 
     def possible_moves(self):
+    	# We check surrounding tiles of a tile. If the number of surrounding mines equals tile's number,
+    	# we conclude that surrounding unknown tiles are clear.
         moves = []
         for y in range(self.height):
             for x in range(self.width):
@@ -46,13 +50,18 @@ class Strategy(GameBoard):
                             moves.append(p)
         return moves
 
+    #TODO
+    def find_contradiction(self, board) -> bool:
+    	# when we can not find a move to play, we flag a random tile as mine, and then try to find contradictions.
+    	# we try to play moves that have the highest probability of being false. Highest it can get is 1/2.
+    	# if we can find a contradiction, then we know that given tile is clear.
+    	pass
+
 
     def game(self):
         self.mouse.click(0, 0) #focus click
         self.mouse.click(0, 0) #initial click
 
-        n = 0
-        
         while True:
             self.mouse.move_away_mouse()
             self.update_board()
@@ -60,8 +69,8 @@ class Strategy(GameBoard):
             moves = self.possible_moves()
 
             if not moves:
-                #self.click_unknown_tile()
-                i = input('[+] I could not find a move.\n[+] Play a move and press Enter to let me continue.')
+            	print('[+] I could not find a move.')
+                i = input('[+] Play a move and press Enter to let me continue.')
                 if i == "b":
                     self.print_board()
             else:
