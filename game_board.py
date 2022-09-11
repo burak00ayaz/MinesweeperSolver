@@ -6,6 +6,18 @@ from enum import Enum
 import os
 
 class GameBoard:
+    #tile types
+    UNKNOWN = 0
+    MINE = -1
+    CLEAR = 8
+    ONE = 1
+    TWO = 2
+    THREE = 3
+    FOUR = 4
+    FIVE = 5
+
+    #board: 2 dimensional array where we keep tile types 0, -1, ..
+    #tiles: 2 dimensional array where we keep the coordinates of tiles in the screen
     def __init__(self):
         os.system('color')
         screenshot = self.get_screenshot()
@@ -39,16 +51,6 @@ class GameBoard:
     def get_screenshot(self) -> np.ndarray:
         image = pyautogui.screenshot()
         return cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-
-    class TileType(Enum):
-        UNKNOWN = 0
-        MINE = -1
-        CLEAR = 8
-        ONE = 1
-        TWO = 2
-        THREE = 3
-        FOUR = 4
-        FIVE = 5
 
     class MouseController:
         def __init__(self, outer_instance):
@@ -118,7 +120,8 @@ class GameBoard:
         self.find_figures(screenshot, three, 3)
         self.find_figures(screenshot, four, 4)
         self.find_figures(screenshot, five, 5)
-        self.board[self.board == 0] = 8
+        #mark every previously unknown tiles as clear, then mark currently unknown tiles
+        self.board[self.board == self.UNKNOWN] = self.CLEAR
         self.find_figures(screenshot, square, 0)
 
 os.chdir('images')
