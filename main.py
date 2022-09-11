@@ -56,6 +56,7 @@ class Strategy(GameBoard):
         #2. tile'in etrafinda yeterince mayin olamaz. bos yerlerin sayisi yetmiyor.
         pass
 
+    #TODO
     def moves_with_chance(self, chance: float):
         pass
 

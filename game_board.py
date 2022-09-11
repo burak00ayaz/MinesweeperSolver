@@ -19,7 +19,7 @@ class GameBoard:
     #board: 2 dimensional array where we keep tile types 0, -1, ..
     #tiles: 2 dimensional array where we keep the coordinates of tiles in the screen
     def __init__(self):
-        os.system('color')
+        os.system('color') #enable colored terminal output
         screenshot = self.get_screenshot()
         tiles = self.template_match(square, screenshot)
         if not tiles:
@@ -35,10 +35,9 @@ class GameBoard:
         print('width: ' + str(self.width))
         print('height: ' + str(self.height))
 
-    def template_match(self, small_image: np.ndarray, large_image: np.ndarray):
+    def template_match(self, small_image: np.ndarray, large_image: np.ndarray, threshold=0.95):
         w, h = small_image.shape[:-1]
         result = cv2.matchTemplate(small_image, large_image, cv2.TM_CCOEFF_NORMED)
-        threshold = .95
         loc = np.where(result >= threshold)
         results = []
         for pt in zip(*loc[::-1]):  # Switch collumns and rows
@@ -101,7 +100,7 @@ class GameBoard:
                     return
 
     def find_figures(self, screenshot, image, value):
-        results = self.template_match(image, screenshot)
+        results = self.template_match(image, screenshot, threshold=0.8)
         for p in results:
             self.update_tile(p, value)
         return results
