@@ -25,6 +25,8 @@ class Strategy(GameBoard):
         for y in range(self.height):
             for x in range(self.width):
                 value = self.board[y][x]
+                if value in [self.UNKNOWN, self.MINE, self.CLEAR]:
+                    continue
                 surr = self.get_surrounding_tiles(x,y)
                 unknowns = [p for p in surr if self.board[p[1]][p[0]] == self.UNKNOWN] #count unknowns
                 mines = [p for p in surr if self.board[p[1]][p[0]] == self.MINE] #count mines
@@ -61,8 +63,15 @@ class Strategy(GameBoard):
         #2. tile'in etrafinda yeterince mayin olamaz. bos yerlerin sayisi yetmiyor.
         pass
 
-    def moves_sorted_by_chance(self):
-    	pass
+    def moves_with_chance(self, chance: float):
+        pass
+        for y in range(self.height):
+            for x in range(self.width):
+                value = self.board[y][x]
+                if value in [self.UNKNOWN, self.MINE, self.CLEAR]:
+                    continue
+                surr = self.get_surrounding_tiles(x,y)
+                mines = [p for p in surr if self.board[p[1]][p[0]] == self.MINE] #count mines
 
 
     def game(self):
@@ -79,6 +88,7 @@ class Strategy(GameBoard):
                 self.mouse.click(move[0], move[1])      
                         
             if not moves:
+                self.moves_with_chance()
                 print('[+] I could not find a move.')
                 i = input('[+] Play a move and press Enter to let me continue.')
                 if i == "b":
