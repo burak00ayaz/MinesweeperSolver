@@ -12,18 +12,18 @@ class Strategy(GameBoard):
     def __init__(self):
         GameBoard.__init__(self)
 
-    def tiles_with_values(self):
+    def tiles_with_values(self, just_numbers=False):
         for y in range(self.height):
             for x in range(self.width):
                 value = self.board[y][x]
+                if just_numbers and value in [self.UNKNOWN, self.MINE, self.CLEAR]:
+                    continue
                 yield (x,y), value
 
     def flag_mines(self):
         # We check surrounding tiles of a tile. If the sum of surrounding unknown tiles
         # and flagged mines equals the tile's number, we conclude that the unknown tiles are mines. 
-        for (x,y), value in self.tiles_with_values():
-            if value in [self.UNKNOWN, self.MINE, self.CLEAR]:
-                continue
+        for (x,y), value in self.tiles_with_values(just_numbers=True):
             surr = self.get_surrounding_tiles(x,y)
             unknowns = [p for p in surr if self.board[p[1]][p[0]] == self.UNKNOWN] #count unknowns
             mines = [p for p in surr if self.board[p[1]][p[0]] == self.MINE] #count mines
@@ -36,9 +36,7 @@ class Strategy(GameBoard):
         # We check surrounding tiles of a tile. If the number of surrounding mines equals tile's number,
         # we conclude that surrounding unknown tiles are clear.
         moves = []
-        for (x,y), value in self.tiles_with_values():
-            if value in [self.UNKNOWN, self.MINE, self.CLEAR]:
-                continue
+        for (x,y), value in self.tiles_with_values(just_numbers=True):
             surr = self.get_surrounding_tiles(x,y)
             mines = [p for p in surr if self.board[p[1]][p[0]] == self.MINE] #count mines
             if len(mines) == value:
