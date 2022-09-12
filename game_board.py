@@ -15,6 +15,7 @@ class GameBoard:
     THREE = 3
     FOUR = 4
     FIVE = 5
+    SIX = 6
 
     #board: 2 dimensional array where we keep tile types 0, -1, ..
     #tiles: 2 dimensional array where we keep the coordinates of tiles in the screen
@@ -32,6 +33,8 @@ class GameBoard:
         self.tiles = np.reshape(tiles, (self.height, self.width, 2))
         self.board = np.zeros((self.height, self.width), dtype=np.byte)
         self.mouse = GameBoard.MouseController(self)
+        smile = self.template_match(smiley, screenshot)
+        self.smiley = (smile[0][0], smile[0][1])
         print('width: ' + str(self.width))
         print('height: ' + str(self.height))
 
@@ -104,8 +107,10 @@ class GameBoard:
         for p in results:
             self.update_tile(p, value)
         return results
-        
 
+    def reset_game(self):
+        pyautogui.click(self.smiley[0], self.smiley[1])            
+        
     def update_board(self):
         screenshot = self.get_screenshot()
         if self.template_match(dead, screenshot):
@@ -119,6 +124,7 @@ class GameBoard:
         self.find_figures(screenshot, three, 3)
         self.find_figures(screenshot, four, 4)
         self.find_figures(screenshot, five, 5)
+        self.find_figures(screenshot, six, 6)
         #mark every previously unknown tiles as clear, then mark currently unknown tiles
         self.board[self.board == self.UNKNOWN] = self.CLEAR
         self.find_figures(screenshot, square, 0)
@@ -130,5 +136,7 @@ two = cv2.imread('two.png')
 three = cv2.imread('three.png')
 four = cv2.imread('four.png')
 five = cv2.imread('five.png')
+six = cv2.imread('six.png')
 dead = cv2.imread('dead.png')
 won = cv2.imread('won.png')
+smiley = cv2.imread('smiley.png')
